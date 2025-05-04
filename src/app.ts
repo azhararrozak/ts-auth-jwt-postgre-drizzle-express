@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import { pool } from './config/db'; 
 
 dotenv.config();
 
@@ -7,6 +8,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+pool
+  .connect()
+  .then(() => {
+    console.log('✅ Connected to PostgreSQL');
+  })
+  .catch((err) => {
+    console.error('❌ Failed to connect to PostgreSQL:', err);
+  });
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
