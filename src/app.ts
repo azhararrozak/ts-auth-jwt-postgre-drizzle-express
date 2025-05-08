@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { pool } from './config/db';
 import cors from 'cors'; 
+import authRoutes from './routes/auth.routes';
 
 dotenv.config();
 
@@ -27,6 +28,8 @@ pool
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
+
+app.use('/api/auth', authRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running at http://127.0.0.1:${PORT}`);
