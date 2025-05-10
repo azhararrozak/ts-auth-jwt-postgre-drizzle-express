@@ -33,13 +33,19 @@ Berikut adalah dependensi utama yang digunakan dalam proyek ini:
     JWT_SECRET=your_jwt_secret
     ```
 
-4. **Menjalankan Aplikasi**
+5. **Menjalankan Migrate**
+    Jalankan server menggunakan perintah berikut:
+    ```bash
+    npx drizzle-kit migrate
+    ```
+
+6. **Menjalankan Aplikasi**
     Jalankan server menggunakan perintah berikut:
     ```bash
     npm run dev
     ```
 
-5. **Akses Aplikasi**
+7. **Akses Aplikasi**
     Aplikasi akan berjalan di `http://localhost:3000`.
 
 ## Copyright
