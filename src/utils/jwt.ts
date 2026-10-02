@@ -1,11 +1,30 @@
 import jwt from 'jsonwebtoken';
+import { env } from '../config/env';
+import type { UserRole } from '../models/user.model';
 
-const SECRET = process.env.JWT_SECRET || 'supersecret';
+export interface AccessTokenPayload {
+  id: number;
+  email: string;
+  role: UserRole;
+}
 
-export const signToken = (payload: object) => {
-  return jwt.sign(payload, SECRET, { expiresIn: '1d' });
-};
+export interface RefreshTokenPayload {
+  id: number;
+  jti: string;
+}
 
-export const verifyToken = (token: string) => {
-  return jwt.verify(token, SECRET);
-};
+export const signAccessToken = (payload: AccessTokenPayload): string =>
+  jwt.sign(payload, env.JWT_ACCESS_SECRET, {
+    expiresIn: env.ACCESS_TOKEN_EXPIRES as jwt.SignOptions['expiresIn'],
+  });
+
+export const verifyAccessToken = (token: string): AccessTokenPayload =>
+  jwt.verify(token, env.JWT_ACCESS_SECRET) as AccessTokenPayload;
+
+export const signRefreshToken = (payload: RefreshTokenPayload): string =>
+  jwt.sign(payload, env.JWT_REFRESH_SECRET, {
+    expiresIn: `${env.REFRESH_TOKEN_EXPIRES_DAYS}d`,
+  });
+
+export const verifyRefreshToken = (token: string): RefreshTokenPayload =>
+  jwt.verify(token, env.JWT_REFRESH_SECRET) as RefreshTokenPayload;

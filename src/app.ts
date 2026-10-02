@@ -1,36 +1,39 @@
 import express from 'express';
-import dotenv from 'dotenv';
-import { pool } from './config/db';
-import cors from 'cors'; 
-import authRoutes from './routes/auth.routes';
-
-dotenv.config();
+import cors from 'cors';
+import helmet from 'helmet';
+import { env } from './config/env';
+import { apiLimiter } from './middleware/rateLimit.middleware';
+import { errorHandler, notFoundHandler } from './middleware/error.middleware';
+import authRoutes from './modules/auth/auth.routes';
+import userRoutes from './modules/user/user.routes';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-app.use(cors(
-  {
-    origin: '*',
-  }
-));
+app.set('trust proxy', 1);
+app.use(helmet());
+app.use(
+  cors({
+    origin:
+      env.NODE_ENV === 'production'
+        ? env.CORS_ORIGIN?.split(',').map((origin) => origin.trim())
+        : '*',
+  }),
+);
 app.use(express.json());
+app.use('/api', apiLimiter);
 
-pool
-  .connect()
-  .then(() => {
-    console.log('✅ Connected to PostgreSQL');
-  })
-  .catch((err) => {
-    console.error('❌ Failed to connect to PostgreSQL:', err);
+app.get('/', (_req, res) => {
+  res.json({
+    success: true,
+    message: 'API is running',
+    data: { env: env.NODE_ENV },
   });
-
-app.get('/', (req, res) => {
-  res.send('Hello World!');
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://127.0.0.1:${PORT}`);
-});
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+export default app;
